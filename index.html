@@ -2187,7 +2187,7 @@ const files = [
 'wilywars'
 ];
 
-function generateAllSections() {
+        function generateAllSections() {
             const allChars = ['0','1','2','3','4','5','6','7','8','9',
                             'A','B','C','D','E','F','G','H','I','J','K','L','M',
                             'N','O','P','Q','R','S','T','U','V','W','X','Y','Z'];
@@ -2198,21 +2198,19 @@ function generateAllSections() {
             });
 
             files.forEach(file => {
-                let displayChar = "";
                 const lower = file.toLowerCase();
-
-                // Check if it starts with 'cl', otherwise just use the first letter
-                if (lower.startsWith('cl') && lower.length > 2) {
-                    displayChar = lower[2].toUpperCase();
-                } else if (lower.length > 0) {
-                    displayChar = lower[0].toUpperCase();
-                }
-
-                if (filesByChar[displayChar]) {
-                    filesByChar[displayChar].push(file);
+                if (lower.startsWith('cl')) {
+                    const afterCl = lower.substring(2);
+                    if (afterCl.length > 0) {
+                        const firstChar = afterCl[0].toUpperCase();
+                        if (filesByChar[firstChar]) {
+                            filesByChar[firstChar].push(file);
+                        }
+                    }
                 }
             });
 
+            // Helpers used by buttons
             function normalizeFileName(name) {
                 if (name.includes('.') && name.lastIndexOf('.') > 0) return name;
                 return name + '.html';
@@ -2226,18 +2224,11 @@ function generateAllSections() {
             }
 
             const container = document.getElementById('sections-container');
-            container.innerHTML = ""; // Clear existing
-
             allChars.forEach(char => {
                 const section = document.createElement('div');
                 section.className = 'letter-section';
                 section.id = `section-${char}`;
                 
-                // Only show sections that actually have games
-                if (filesByChar[char].length === 0) {
-                    return; 
-                }
-
                 const header = document.createElement('div');
                 header.className = 'letter-header';
                 header.textContent = char;
@@ -2246,44 +2237,56 @@ function generateAllSections() {
                 const buttonsContainer = document.createElement('div');
                 buttonsContainer.className = 'buttons-container';
 
-                filesByChar[char].forEach(file => {
-                    const row = document.createElement('div');
-                    row.className = 'file-row';
+                if (filesByChar[char].length > 0) {
+                    filesByChar[char].forEach(file => {
+                        const row = document.createElement('div');
+                        row.className = 'file-row';
 
-                    const btn = document.createElement('input');
-                    btn.type = 'button';
-                    btn.value = file;
-                    btn.className = 'file-main-btn';
-                    btn.onclick = () => {
-                        const url = buildCdnUrl(file, true);
-                        fetch(url)
-                            .then(response => response.text())
-                            .then(text => {
-                                const newWin = window.open("about:blank", "_blank");
-                                if (newWin) {
-                                    newWin.document.open();
-                                    newWin.document.write(text);
-                                    newWin.document.close();
-                                }
+                        const btn = document.createElement('input');
+                        btn.type = 'button';
+                        btn.value = file;
+                        btn.className = 'file-main-btn';
+                        btn.onclick = () => {
+                            const url = buildCdnUrl(file, true);
+                            fetch(url)
+                                .then(response => response.text())
+                                .then(text => {
+                                    const newWin = window.open("about:blank", "_blank");
+                                    if (newWin) {
+                                        newWin.document.open();
+                                        newWin.document.write(text);
+                                        newWin.document.close();
+                                    }
+                                });
+                        };
+                        btn.style.fontSize = '100%';
+
+                        const copyBtn = document.createElement('button');
+                        copyBtn.className = 'copy-btn';
+                        copyBtn.type = 'button';
+                        copyBtn.title = 'Copy CDN link';
+                        copyBtn.textContent = 'Copy';
+                        copyBtn.onclick = (e) => {
+                            e.stopPropagation();
+                            const url = buildCdnUrl(file, false);
+                            copyToClipboard(url).then(() => {
+                                const prev = copyBtn.textContent;
+                                copyBtn.textContent = 'Copied!';
+                                setTimeout(() => copyBtn.textContent = prev, 1200);
                             });
-                    };
+                        };
 
-                    const copyBtn = document.createElement('button');
-                    copyBtn.className = 'copy-btn';
-                    copyBtn.textContent = 'Copy';
-                    copyBtn.onclick = (e) => {
-                        e.stopPropagation();
-                        const url = buildCdnUrl(file, false);
-                        copyToClipboard(url).then(() => {
-                            copyBtn.textContent = 'Copied!';
-                            setTimeout(() => copyBtn.textContent = 'Copy', 1200);
-                        });
-                    };
-
-                    row.appendChild(btn);
-                    row.appendChild(copyBtn);
-                    buttonsContainer.appendChild(row);
-                });
+                        row.appendChild(btn);
+                        row.appendChild(copyBtn);
+                        buttonsContainer.appendChild(row);
+                    });
+                } else {
+                    section.classList.add('empty');
+                    const emptyMsg = document.createElement('div');
+                    emptyMsg.className = 'empty-message';
+                    emptyMsg.textContent = 'No files';
+                    buttonsContainer.appendChild(emptyMsg);
+                }
 
                 section.appendChild(buttonsContainer);
                 container.appendChild(section);
@@ -2294,16 +2297,6 @@ function generateAllSections() {
 
         function generateSidebar(allChars, filesByChar) {
             const sidebar = document.getElementById('sidebar');
-            sidebar.innerHTML = ""; // Clear existing
-
-            // HOME BUTTON
-            const homeBtn = document.createElement('button');
-            homeBtn.className = 'sidebar-btn';
-            homeBtn.innerHTML = '🏠';
-            homeBtn.style.background = '#ff4757';
-            homeBtn.style.marginBottom = '10px';
-            homeBtn.onclick = () => window.location.href = 'https://realhome-74e.pages.dev';
-            sidebar.appendChild(homeBtn);
             
             allChars.forEach(char => {
                 const btn = document.createElement('button');
@@ -2320,6 +2313,11 @@ function generateAllSections() {
                         }
                     };
                 }
+                
                 sidebar.appendChild(btn);
             });
         }
+        window.addEventListener('DOMContentLoaded', generateAllSections);
+    </script>
+</body>
+</html>
