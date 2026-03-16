@@ -2244,138 +2244,149 @@ const files = [
 'vvvvvv',
 'wilywars'
 ];
+];
+
+// This function starts the page logic
+function init() {
+    generateAllSections();
+}
+
+// Run the init function when the window loads
+window.onload = init;
+
 function generateAllSections() {
-            const allChars = ['0','1','2','3','4','5','6','7','8','9',
-                            'A','B','C','D','E','F','G','H','I','J','K','L','M',
-                            'N','O','P','Q','R','S','T','U','V','W','X','Y','Z'];
-            
-            const filesByChar = {};
-            allChars.forEach(char => {
-                filesByChar[char] = [];
-            });
+    const allChars = ['0','1','2','3','4','5','6','7','8','9',
+                    'A','B','C','D','E','F','G','H','I','J','K','L','M',
+                    'N','O','P','Q','R','S','T','U','V','W','X','Y','Z'];
+    
+    const filesByChar = {};
+    allChars.forEach(char => {
+        filesByChar[char] = [];
+    });
 
-            files.forEach(file => {
-                const lower = file.toLowerCase();
-                if (lower.startsWith('cl')) {
-                    const afterCl = lower.substring(2);
-                    if (afterCl.length > 0) {
-                        const firstChar = afterCl[0].toUpperCase();
-                        if (filesByChar[firstChar]) {
-                            filesByChar[firstChar].push(file);
-                        }
-                    }
-                }
-            });
+    files.forEach(file => {
+        let displayChar = "";
+        const lower = file.toLowerCase();
 
-            function normalizeFileName(name) {
-                if (name.includes('.') && name.lastIndexOf('.') > 0) return name;
-                return name + '.html';
-            }
-
-            function buildCdnUrl(name, includeTimestamp = false) {
-                const normalized = normalizeFileName(name);
-                const encoded = encodeURIComponent(normalized);
-                const base = `https://cdn.jsdelivr.net/gh/bubbls/ugs-singlefile/UGS-Files/${encoded}`;
-                return includeTimestamp ? `${base}?t=${Date.now()}` : base;
-            }
-
-            const container = document.getElementById('sections-container');
-            allChars.forEach(char => {
-                const section = document.createElement('div');
-                section.className = 'letter-section';
-                section.id = `section-${char}`;
-                
-                const header = document.createElement('div');
-                header.className = 'letter-header';
-                header.textContent = char;
-                section.appendChild(header);
-
-                const buttonsContainer = document.createElement('div');
-                buttonsContainer.className = 'buttons-container';
-
-                if (filesByChar[char].length > 0) {
-                    filesByChar[char].forEach(file => {
-                        const row = document.createElement('div');
-                        row.className = 'file-row';
-
-                        const btn = document.createElement('input');
-                        btn.type = 'button';
-                        btn.value = file;
-                        btn.className = 'file-main-btn';
-                        
-                        // --- START UPDATED ONCLICK ---
-                        btn.onclick = () => {
-                            const url = buildCdnUrl(file, true);
-                            const name = file.replace(/^cl/, '').replace(/([A-Z])/g, ' $1').trim();
-                            
-                            const content = `
-                                <!DOCTYPE html>
-                                <html>
-                                <head>
-                                    <title>${name}</title>
-                                    <link rel="icon" href="https://ssl.gstatic.com/docs/doclist/images/infinite_growth_customer_emails.png">
-                                    <style>
-                                        body, html { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; background: #000; font-family: sans-serif; }
-                                        iframe { border: none; width: 100%; height: 100%; }
-                                        .back-btn {
-                                            position: fixed; top: 15px; left: 15px;
-                                            padding: 8px 16px; background: rgba(0, 0, 0, 0.5);
-                                            color: white; border: 1px solid rgba(255, 255, 255, 0.2);
-                                            border-radius: 20px; cursor: pointer; z-index: 99999;
-                                            font-weight: bold; text-decoration: none; backdrop-filter: blur(4px);
-                                            font-size: 13px; transition: 0.2s;
-                                        }
-                                        .back-btn:hover { background: rgba(255, 255, 255, 0.2); }
-                                    </style>
-                                </head>
-                                <body>
-                                    <a href="javascript:location.reload()" class="back-btn">← </a>
-                                    <iframe src="${url}"></iframe>
-                                    <script>
-                                        window.addEventListener('keydown', function(e) {
-                                            if (e.key.toLowerCase() === 'q') window.location.replace('https://classroom.google.com');
-                                        });
-                                    <\/script>
-                                </body>
-                                </html>`;
-                            document.open();
-                            document.write(content);
-                            document.close();
-                        };
-                        // --- END UPDATED ONCLICK ---
-
-                        btn.style.fontSize = '100%';
-
-                        const copyBtn = document.createElement('button');
-                        copyBtn.className = 'copy-btn';
-                        copyBtn.type = 'button';
-                        copyBtn.title = 'Copy CDN link';
-                        copyBtn.textContent = 'Copy';
-                        copyBtn.onclick = (e) => {
-                            e.stopPropagation();
-                            const url = buildCdnUrl(file, false);
-                            copyToClipboard(url).then(() => {
-                                const prev = copyBtn.textContent;
-                                copyBtn.textContent = 'Copied!';
-                                setTimeout(() => copyBtn.textContent = prev, 1200);
-                            });
-                        };
-
-                        row.appendChild(btn);
-                        row.appendChild(copyBtn);
-                        buttonsContainer.appendChild(row);
-                    });
-                } else {
-                    section.classList.add('empty');
-                    const emptyMsg = document.createElement('div');
-                    emptyMsg.className = 'empty-message';
-                    emptyMsg.textContent = 'No files';
-                    buttonsContainer.appendChild(emptyMsg);
-                }
-
-                section.appendChild(buttonsContainer);
-                container.appendChild(section);
-            });
-
-            generateSidebar(allChars, filesByChar);
+        if (lower.startsWith('cl') && lower.length > 2) {
+            displayChar = lower[2].toUpperCase();
+        } else if (lower.length > 0) {
+            displayChar = lower[0].toUpperCase();
         }
+
+        if (filesByChar[displayChar]) {
+            filesByChar[displayChar].push(file);
+        }
+    });
+
+    function normalizeFileName(name) {
+        if (name.includes('.') && name.lastIndexOf('.') > 0) return name;
+        return name + '.html';
+    }
+
+    function buildCdnUrl(name, includeTimestamp = false) {
+        const normalized = normalizeFileName(name);
+        const encoded = encodeURIComponent(normalized);
+        const base = `https://cdn.jsdelivr.net/gh/bubbls/ugs-singlefile/UGS-Files/${encoded}`;
+        return includeTimestamp ? `${base}?t=${Date.now()}` : base;
+    }
+
+    const container = document.getElementById('sections-container');
+    container.innerHTML = ""; 
+
+    allChars.forEach(char => {
+        if (filesByChar[char].length === 0) return;
+
+        const section = document.createElement('div');
+        section.className = 'letter-section';
+        section.id = `section-${char}`;
+
+        const header = document.createElement('div');
+        header.className = 'letter-header';
+        header.textContent = char;
+        section.appendChild(header);
+
+        const buttonsContainer = document.createElement('div');
+        buttonsContainer.className = 'buttons-container';
+
+        filesByChar[char].forEach(file => {
+            const row = document.createElement('div');
+            row.className = 'file-row';
+
+            const btn = document.createElement('input');
+            btn.type = 'button';
+            btn.value = file;
+            btn.className = 'file-main-btn';
+            btn.onclick = () => openGame(buildCdnUrl(file, true));
+
+            const copyBtn = document.createElement('button');
+            copyBtn.className = 'copy-btn';
+            copyBtn.textContent = 'Copy';
+            copyBtn.onclick = (e) => {
+                e.stopPropagation();
+                copyToClipboard(buildCdnUrl(file, false)).then(() => {
+                    copyBtn.textContent = 'Copied!';
+                    setTimeout(() => copyBtn.textContent = 'Copy', 1200);
+                });
+            };
+
+            row.appendChild(btn);
+            row.appendChild(copyBtn);
+            buttonsContainer.appendChild(row);
+        });
+
+        section.appendChild(buttonsContainer);
+        container.appendChild(section);
+    });
+
+    generateSidebar(allChars, filesByChar);
+}
+
+function generateSidebar(allChars, filesByChar) {
+    const sidebar = document.getElementById('sidebar');
+    sidebar.innerHTML = ""; 
+
+    const homeBtn = document.createElement('button');
+    homeBtn.className = 'sidebar-btn';
+    homeBtn.innerHTML = '🏠';
+    homeBtn.style.background = '#ff4757';
+    homeBtn.style.marginBottom = '10px';
+    homeBtn.onclick = () => window.location.href = 'https://realhome-74e.pages.dev';
+    sidebar.appendChild(homeBtn);
+    
+    allChars.forEach(char => {
+        const btn = document.createElement('button');
+        btn.className = 'sidebar-btn';
+        btn.textContent = char;
+        
+        if (filesByChar[char].length === 0) {
+            btn.classList.add('empty');
+        } else {
+            btn.onclick = () => {
+                const section = document.getElementById(`section-${char}`);
+                if (section) section.scrollIntoView({ behavior: 'smooth' });
+            };
+        }
+        sidebar.appendChild(btn);
+        function openGame(url) {
+    fetch(url)
+        .then(res => res.text())
+        .then(html => {
+            const newWin = window.open("about:blank", "_blank");
+            if (newWin) {
+                newWin.document.open();
+                newWin.document.write(`
+                    <button onclick="window.close()" style="position:fixed;top:10px;left:10px;z-index:9999;padding:10px;background:#ff4757;color:white;border:none;border-radius:5px;cursor:pointer;font-weight:bold;">← Back</button>
+                    <script>
+                        window.addEventListener('keydown', (e) => {
+                            if (e.key === '~') window.location.href = 'https://google.com';
+                        });
+                    <\/script>
+                    ${html}
+                `);
+                newWin.document.close();
+            }
+        });
+}
+    });
+}
