@@ -4,53 +4,56 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Grades and Attendance</title>
- <style>
-    /* 1. Header Styling */
-    .custom-top-nav {
-        display: flex;
-        align-items: center;
-        padding: 0 25px;
-        background-color: #000000;
-        height: 70px;
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        z-index: 10000; /* Stays above everything */
-        border-bottom: 1px solid #1a1a1a;
-        box-sizing: border-box;
+<style>
+    /* Reset body margin so there is no gap */
+    body {
+        margin: 0;
+        padding: 0;
+        display: block !important; /* Fixes layout alignment */
     }
 
-    /* 2. Home Button Styling */
+    .custom-top-bar {
+        background-color: #000000;
+        width: 100%;
+        padding: 15px 25px;
+        display: flex;
+        align-items: center;
+        box-sizing: border-box;
+        border-bottom: 1px solid #1a1a1a;
+    }
+
     .back-home-link {
         text-decoration: none;
         color: #4db8ff;
         border: 2px solid #4db8ff;
-        padding: 8px 20px;
+        padding: 6px 18px;
         border-radius: 30px;
         font-weight: bold;
         font-family: sans-serif;
-        font-size: 14px;
-        transition: all 0.2s ease;
+        font-size: 13px;
+        transition: 0.2s;
         text-transform: uppercase;
     }
 
     .back-home-link:hover {
         background: rgba(77, 184, 255, 0.1);
-        box-shadow: 0 0 15px rgba(77, 184, 255, 0.4);
+        box-shadow: 0 0 10px rgba(77, 184, 255, 0.4);
     }
 
-    /* 3. FIX THE SIDEBAR FIGHT - Forces it to start below header */
+    /* This ensures your sidebar and content start AFTER the black bar */
     .sidebar {
-        top: 70px !important; 
-        height: calc(100vh - 70px) !important;
+        position: fixed;
+        top: 70px !important; /* Moves sidebar down exactly the height of the bar */
     }
 
-    /* 4. FIX THE MAIN CONTENT - Pushes text down so header doesn't hide it */
     .main-content {
-        margin-top: 70px !important;
+        margin-top: 20px; /* Gives your 'UGS Files' title some breathing room */
     }
 </style>
+
+<div class="custom-top-bar">
+    <a href="https://realhome-74e.pages.dev" class="back-home-link">← Home</a>
+</div>
 
 <div class="custom-top-nav">
     <a href="https://realhome-74e.pages.dev" class="back-home-link">← Home</a>
