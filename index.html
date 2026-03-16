@@ -2246,14 +2246,16 @@ const files = [
 ];
 
 
-// This function starts the page logic
+// --- START OF PASTE ---
+
+// 1. Initialize the page logic
 function init() {
     generateAllSections();
 }
 
-// Run the init function when the window loads
 window.onload = init;
 
+// 2. Main logic to build the A-Z sections
 function generateAllSections() {
     const allChars = ['0','1','2','3','4','5','6','7','8','9',
                     'A','B','C','D','E','F','G','H','I','J','K','L','M',
@@ -2317,7 +2319,7 @@ function generateAllSections() {
             btn.type = 'button';
             btn.value = file;
             btn.className = 'file-main-btn';
-            btn.onclick = () => openGame(buildCdnUrl(file, true));
+            btn.onclick = () => openGame(buildCdnUrl(file, true), file);
 
             const copyBtn = document.createElement('button');
             copyBtn.className = 'copy-btn';
@@ -2342,6 +2344,7 @@ function generateAllSections() {
     generateSidebar(allChars, filesByChar);
 }
 
+// 3. Generate the sidebar navigation
 function generateSidebar(allChars, filesByChar) {
     const sidebar = document.getElementById('sidebar');
     sidebar.innerHTML = ""; 
@@ -2368,25 +2371,47 @@ function generateSidebar(allChars, filesByChar) {
             };
         }
         sidebar.appendChild(btn);
-        function openGame(url) {
+    });
+}
+
+// 4. THE GAME LAUNCHER (With Back Arrow and Panic Key)
+function openGame(url, name) {
     fetch(url)
         .then(res => res.text())
         .then(html => {
-            const newWin = window.open("about:blank", "_blank");
-            if (newWin) {
-                newWin.document.open();
-                newWin.document.write(`
-                    <button onclick="window.close()" style="position:fixed;top:10px;left:10px;z-index:9999;padding:10px;background:#ff4757;color:white;border:none;border-radius:5px;cursor:pointer;font-weight:bold;">← Back</button>
+            document.open();
+            document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>${name}</title>
+                    <link rel="icon" href="https://ssl.gstatic.com/docs/doclist/images/infinite_growth_customer_emails.png">
+                    <style>
+                        body, html { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; background: #000; }
+                        .back-btn {
+                            position: fixed; top: 15px; left: 15px;
+                            padding: 8px 16px; background: rgba(0, 0, 0, 0.5);
+                            color: white; border: 1px solid rgba(255, 255, 255, 0.2);
+                            border-radius: 20px; cursor: pointer; z-index: 99999;
+                            font-weight: bold; font-size: 13px; backdrop-filter: blur(4px);
+                        }
+                        .back-btn:hover { background: rgba(255, 255, 255, 0.2); }
+                    </style>
+                </head>
+                <body>
+                    <button class="back-btn" onclick="location.reload()">← Back</button>
+                    ${html}
                     <script>
                         window.addEventListener('keydown', (e) => {
-                            if (e.key === '~') window.location.href = 'https://google.com';
+                            if (e.key === '~' || e.key.toLowerCase() === 'q') {
+                                window.location.replace('https://classroom.google.com');
+                            }
                         });
                     <\/script>
-                    ${html}
-                `);
-                newWin.document.close();
-            }
+                </body>
+                </html>
+            `);
+            document.close();
         });
 }
-    });
-}
+// --- END OF PASTE ---
