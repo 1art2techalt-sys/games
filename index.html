@@ -2246,172 +2246,166 @@ const files = [
 ];
 
 
-// --- START OF PASTE ---
-
-// 1. Initialize the page logic
-function init() {
-    generateAllSections();
-}
-
-window.onload = init;
-
-// 2. Main logic to build the A-Z sections
-function generateAllSections() {
-    const allChars = ['0','1','2','3','4','5','6','7','8','9',
-                    'A','B','C','D','E','F','G','H','I','J','K','L','M',
-                    'N','O','P','Q','R','S','T','U','V','W','X','Y','Z'];
-    
-    const filesByChar = {};
-    allChars.forEach(char => {
-        filesByChar[char] = [];
-    });
-
-    files.forEach(file => {
-        let displayChar = "";
-        const lower = file.toLowerCase();
-
-        if (lower.startsWith('cl') && lower.length > 2) {
-            displayChar = lower[2].toUpperCase();
-        } else if (lower.length > 0) {
-            displayChar = lower[0].toUpperCase();
+// This function starts the page logic
+        function init() {
+            generateAllSections();
         }
 
-        if (filesByChar[displayChar]) {
-            filesByChar[displayChar].push(file);
-        }
-    });
+        // Run the init function when the window loads
+        window.onload = init;
 
-    function normalizeFileName(name) {
-        if (name.includes('.') && name.lastIndexOf('.') > 0) return name;
-        return name + '.html';
-    }
+        function generateAllSections() {
+            const allChars = ['0','1','2','3','4','5','6','7','8','9',
+                            'A','B','C','D','E','F','G','H','I','J','K','L','M',
+                            'N','O','P','Q','R','S','T','U','V','W','X','Y','Z'];
+            
+            const filesByChar = {};
+            allChars.forEach(char => {
+                filesByChar[char] = [];
+            });
 
-    function buildCdnUrl(name, includeTimestamp = false) {
-        const normalized = normalizeFileName(name);
-        const encoded = encodeURIComponent(normalized);
-        const base = `https://cdn.jsdelivr.net/gh/bubbls/ugs-singlefile/UGS-Files/${encoded}`;
-        return includeTimestamp ? `${base}?t=${Date.now()}` : base;
-    }
+            files.forEach(file => {
+                let displayChar = "";
+                const lower = file.toLowerCase();
 
-    const container = document.getElementById('sections-container');
-    container.innerHTML = ""; 
+                if (lower.startsWith('cl') && lower.length > 2) {
+                    displayChar = lower[2].toUpperCase();
+                } else if (lower.length > 0) {
+                    displayChar = lower[0].toUpperCase();
+                }
 
-    allChars.forEach(char => {
-        if (filesByChar[char].length === 0) return;
+                if (filesByChar[displayChar]) {
+                    filesByChar[displayChar].push(file);
+                }
+            });
 
-        const section = document.createElement('div');
-        section.className = 'letter-section';
-        section.id = `section-${char}`;
+            function normalizeFileName(name) {
+                if (name.includes('.') && name.lastIndexOf('.') > 0) return name;
+                return name + '.html';
+            }
 
-        const header = document.createElement('div');
-        header.className = 'letter-header';
-        header.textContent = char;
-        section.appendChild(header);
+            function buildCdnUrl(name, includeTimestamp = false) {
+                const normalized = normalizeFileName(name);
+                const encoded = encodeURIComponent(normalized);
+                const base = `https://cdn.jsdelivr.net/gh/bubbls/ugs-singlefile/UGS-Files/${encoded}`;
+                return includeTimestamp ? `${base}?t=${Date.now()}` : base;
+            }
 
-        const buttonsContainer = document.createElement('div');
-        buttonsContainer.className = 'buttons-container';
+            const container = document.getElementById('sections-container');
+            container.innerHTML = ""; 
 
-        filesByChar[char].forEach(file => {
-            const row = document.createElement('div');
-            row.className = 'file-row';
+            allChars.forEach(char => {
+                if (filesByChar[char].length === 0) return;
 
-            const btn = document.createElement('input');
-            btn.type = 'button';
-            btn.value = file;
-            btn.className = 'file-main-btn';
-            btn.onclick = () => openGame(buildCdnUrl(file, true), file);
+                const section = document.createElement('div');
+                section.className = 'letter-section';
+                section.id = `section-${char}`;
 
-            const copyBtn = document.createElement('button');
-            copyBtn.className = 'copy-btn';
-            copyBtn.textContent = 'Copy';
-            copyBtn.onclick = (e) => {
-                e.stopPropagation();
-                copyToClipboard(buildCdnUrl(file, false)).then(() => {
-                    copyBtn.textContent = 'Copied!';
-                    setTimeout(() => copyBtn.textContent = 'Copy', 1200);
-                });
-            };
+                const header = document.createElement('div');
+                header.className = 'letter-header';
+                header.textContent = char;
+                section.appendChild(header);
 
-            row.appendChild(btn);
-            row.appendChild(copyBtn);
-            buttonsContainer.appendChild(row);
-        });
+                const buttonsContainer = document.createElement('div');
+                buttonsContainer.className = 'buttons-container';
 
-        section.appendChild(buttonsContainer);
-        container.appendChild(section);
-    });
+                filesByChar[char].forEach(file => {
+                    const row = document.createElement('div');
+                    row.className = 'file-row';
 
-    generateSidebar(allChars, filesByChar);
-}
+                    const btn = document.createElement('input');
+                    btn.type = 'button';
+                    btn.value = file;
+                    btn.className = 'file-main-btn';
+                    btn.onclick = () => openGame(buildCdnUrl(file, true), file);
 
-// 3. Generate the sidebar navigation
-function generateSidebar(allChars, filesByChar) {
-    const sidebar = document.getElementById('sidebar');
-    sidebar.innerHTML = ""; 
-
-    const homeBtn = document.createElement('button');
-    homeBtn.className = 'sidebar-btn';
-    homeBtn.innerHTML = '🏠';
-    homeBtn.style.background = '#ff4757';
-    homeBtn.style.marginBottom = '10px';
-    homeBtn.onclick = () => window.location.href = 'https://realhome-74e.pages.dev';
-    sidebar.appendChild(homeBtn);
-    
-    allChars.forEach(char => {
-        const btn = document.createElement('button');
-        btn.className = 'sidebar-btn';
-        btn.textContent = char;
-        
-        if (filesByChar[char].length === 0) {
-            btn.classList.add('empty');
-        } else {
-            btn.onclick = () => {
-                const section = document.getElementById(`section-${char}`);
-                if (section) section.scrollIntoView({ behavior: 'smooth' });
-            };
-        }
-        sidebar.appendChild(btn);
-    });
-}
-
-// 4. THE GAME LAUNCHER (With Back Arrow and Panic Key)
-function openGame(url, name) {
-    fetch(url)
-        .then(res => res.text())
-        .then(html => {
-            document.open();
-            document.write(`
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <title>${name}</title>
-                    <link rel="icon" href="https://ssl.gstatic.com/docs/doclist/images/infinite_growth_customer_emails.png">
-                    <style>
-                        body, html { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; background: #000; }
-                        .back-btn {
-                            position: fixed; top: 15px; left: 15px;
-                            padding: 8px 16px; background: rgba(0, 0, 0, 0.5);
-                            color: white; border: 1px solid rgba(255, 255, 255, 0.2);
-                            border-radius: 20px; cursor: pointer; z-index: 99999;
-                            font-weight: bold; font-size: 13px; backdrop-filter: blur(4px);
-                        }
-                        .back-btn:hover { background: rgba(255, 255, 255, 0.2); }
-                    </style>
-                </head>
-                <body>
-                    <button class="back-btn" onclick="location.reload()">← Back</button>
-                    ${html}
-                    <script>
-                        window.addEventListener('keydown', (e) => {
-                            if (e.key === '~' || e.key.toLowerCase() === 'q') {
-                                window.location.replace('https://classroom.google.com');
-                            }
+                    const copyBtn = document.createElement('button');
+                    copyBtn.className = 'copy-btn';
+                    copyBtn.textContent = 'Copy';
+                    copyBtn.onclick = (e) => {
+                        e.stopPropagation();
+                        copyToClipboard(buildCdnUrl(file, false)).then(() => {
+                            copyBtn.textContent = 'Copied!';
+                            setTimeout(() => copyBtn.textContent = 'Copy', 1200);
                         });
-                    <\/script>
-                </body>
-                </html>
-            `);
-            document.close();
-        });
-}
-// --- END OF PASTE ---
+                    };
+
+                    row.appendChild(btn);
+                    row.appendChild(copyBtn);
+                    buttonsContainer.appendChild(row);
+                });
+
+                section.appendChild(buttonsContainer);
+                container.appendChild(section);
+            });
+
+            generateSidebar(allChars, filesByChar);
+        }
+
+        function generateSidebar(allChars, filesByChar) {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.innerHTML = ""; 
+
+            const homeBtn = document.createElement('button');
+            homeBtn.className = 'sidebar-btn';
+            homeBtn.innerHTML = '🏠';
+            homeBtn.style.background = '#ff4757';
+            homeBtn.style.marginBottom = '10px';
+            homeBtn.onclick = () => window.location.href = 'https://realhome-74e.pages.dev';
+            sidebar.appendChild(homeBtn);
+            
+            allChars.forEach(char => {
+                const btn = document.createElement('button');
+                btn.className = 'sidebar-btn';
+                btn.textContent = char;
+                
+                if (filesByChar[char].length === 0) {
+                    btn.classList.add('empty');
+                } else {
+                    btn.onclick = () => {
+                        const section = document.getElementById(`section-${char}`);
+                        if (section) section.scrollIntoView({ behavior: 'smooth' });
+                    };
+                }
+                sidebar.appendChild(btn);
+            });
+        }
+
+        function openGame(url, name) {
+            fetch(url)
+                .then(res => res.text())
+                .then(html => {
+                    document.open();
+                    document.write(`
+                        <!DOCTYPE html>
+                        <html>
+                        <head>
+                            <title>${name}</title>
+                            <style>
+                                body, html { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; background: #000; }
+                                .back-btn {
+                                    position: fixed; top: 15px; left: 15px;
+                                    padding: 8px 16px; background: rgba(0, 0, 0, 0.5);
+                                    color: white; border: 1px solid rgba(255, 255, 255, 0.2);
+                                    border-radius: 20px; cursor: pointer; z-index: 99999;
+                                    font-weight: bold; backdrop-filter: blur(4px);
+                                }
+                            </style>
+                        </head>
+                        <body>
+                            <button class="back-btn" onclick="location.reload()">← Back</button>
+                            ${html}
+                            <script>
+                                window.addEventListener('keydown', (e) => {
+                                    if (e.key === '~') window.location.replace('https://classroom.google.com');
+                                });
+                            <\/script>
+                        </body>
+                        </html>
+                    `);
+                    document.close();
+                });
+        }
+    </script>
+</body>
+</html>
