@@ -6,7 +6,57 @@
     <title>Grades and Attendance</title>
     
     <link rel="icon" type="image/png" href="https://thegamewebsite.com/games/logo.png">
+<style>
+    .custom-header-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 15px 20px;
+        background-color: #ffffff; /* Change this to match your theme */
+        border-bottom: 1px solid #eaeaea;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        box-sizing: border-box;
+        width: 100%;
+    }
 
+    .back-home-link {
+        text-decoration: none;
+        color: #0070f3;
+        font-weight: 500;
+        font-size: 16px;
+        width: 80px; /* Reserves space to keep title centered */
+        transition: opacity 0.2s;
+    }
+
+    .back-home-link:hover {
+        opacity: 0.7;
+    }
+
+    .main-header {
+        margin: 0;
+        font-size: 20px;
+        font-weight: 600;
+        color: #333;
+        text-align: center;
+        flex-grow: 1;
+    }
+
+    /* Spacer to balance the "Home" link on the left */
+    .header-spacer {
+        width: 80px;
+    }
+
+    @media (max-width: 480px) {
+        .main-header { font-size: 18px; }
+        .back-home-link { font-size: 14px; }
+    }
+</style>
+
+<div class="custom-header-wrapper">
+    <a href="https://realhome-74e.pages.dev" class="back-home-link">← Home</a>
+    <h1 class="main-header">Requested Games</h1>
+    <div class="header-spacer"></div>
+</div>
     
     <style>
         body {
@@ -2209,11 +2259,7 @@ const files = [
                     }
                 }
             });
-  <div class="header-nav">
-        <a href="https://realhome-74e.pages.dev" class="back-home-link">← Home</a>
-        <h1 class="main-header">Requested Games</h1>
-        <div style="width: 70px;"></div>
-    </div>
+
             // Helpers used by buttons
             function normalizeFileName(name) {
                 if (name.includes('.') && name.lastIndexOf('.') > 0) return name;
